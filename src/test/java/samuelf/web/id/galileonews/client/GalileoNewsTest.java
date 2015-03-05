@@ -15,7 +15,9 @@ package samuelf.web.id.galileonews.client;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import galileonews.api.Msg;
 import galileonews.api.NewsInput;
+import galileonews.api.NewsOutput;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -60,47 +62,54 @@ public class GalileoNewsTest {
 
     @Test
     public void logInTest1() {
-        Entity<NewsInput> newsEntity = Entity.entity(news, APPLICATION_XML_TYPE);
+        Entity<NewsInput> newsInput = Entity.entity(news, APPLICATION_XML_TYPE);
         Response response = client.target("http://localhost:8080/galileonews/news/")
-                .request().post(newsEntity, Response.class);
-        String entity = response.readEntity(String.class);
-        System.out.println(entity);
-        assertTrue(entity.contains("User Name required"));
-        assertTrue(entity.contains("Password required"));
+                .request().post(newsInput, Response.class);
+        NewsOutput newsOutput = response.readEntity(NewsOutput.class);
+        assertTrue(newsOutput.getErrorList().getError().size() == 2);
+        assertEquals("User Name required", newsOutput.getErrorList().getError().get(0));
+        assertEquals("Password required", newsOutput.getErrorList().getError().get(1));
     }
 
     @Test
     public void logInTest2() {
         news.setUserName("user3");
         news.setPassword("user3");
-        Entity<NewsInput> newsEntity = Entity.entity(news, APPLICATION_XML_TYPE);
+        Entity<NewsInput> newsInput = Entity.entity(news, APPLICATION_XML_TYPE);
         Response response = client.target("http://localhost:8080/galileonews/news/")
-                .request().post(newsEntity, Response.class);
-        String entity = response.readEntity(String.class);
-        System.out.println(entity);
-        assertTrue(entity.contains("User Name not registered"));
+                .request().post(newsInput, Response.class);
+        NewsOutput newsOutput = response.readEntity(NewsOutput.class);
+        assertTrue(newsOutput.getErrorList().getError().size() == 1);
+        assertEquals("User Name not registered", newsOutput.getErrorList().getError().get(0));
     }
 
     @Test
     public void logInTest3() {
         news.setUserName("user1");
         news.setPassword("user3");
-        Entity<NewsInput> newsEntity = Entity.entity(news, APPLICATION_XML_TYPE);
+        Entity<NewsInput> newsInput = Entity.entity(news, APPLICATION_XML_TYPE);
         Response response = client.target("http://localhost:8080/galileonews/news/")
-                .request().post(newsEntity, Response.class);
-        String entity = response.readEntity(String.class);
-        System.out.println(entity);
-        assertTrue(entity.contains("User Password not match"));
+                .request().post(newsInput, Response.class);
+        NewsOutput newsOutput = response.readEntity(NewsOutput.class);
+        assertTrue(newsOutput.getErrorList().getError().size() == 1);
+        assertEquals("User Password not match", newsOutput.getErrorList().getError().get(0));
     }
 
     @Test
     public void newsTest1() {
         news.setUserName("user1");
         news.setPassword("user1");
-        Entity<NewsInput> newsEntity = Entity.entity(news, APPLICATION_XML_TYPE);
+        Entity<NewsInput> newsInput = Entity.entity(news, APPLICATION_XML_TYPE);
         Response response = client.target("http://localhost:8080/galileonews/news/")
-                .request().post(newsEntity, Response.class);
-        String entity = response.readEntity(String.class);
-        System.out.println(entity);
+                .request().post(newsInput, Response.class);
+        NewsOutput newsOutput = response.readEntity(NewsOutput.class);
+        assertTrue(newsOutput != null);
+        for (Msg msg : newsOutput.getMsg()) {
+            System.out.println("id:".concat(msg.getId().toString()));
+            for (String line : msg.getLine()) {
+                System.out.println("line:".concat(line));
+            }
+
+        }
     }
 }
