@@ -99,12 +99,14 @@ public class GalileoNewsTest {
     public void newsTest1() {
         news.setUserName("user1");
         news.setPassword("user1");
-        news.setImportant(Boolean.FALSE);
+        news.setImportant(Boolean.TRUE);
         Entity<NewsInput> newsInput = Entity.entity(news, APPLICATION_XML_TYPE);
         Response response = client.target("http://localhost:8080/galileonews/news/")
                 .request().post(newsInput, Response.class);
         NewsOutput newsOutput = response.readEntity(NewsOutput.class);
-        assertTrue(newsOutput != null);        
+        assertTrue(newsOutput != null);
+        assertTrue(newsOutput.getMsg().size() == 1);
+        assertTrue(newsOutput.getMsg().get(0).getId().longValue() == 3);
         for (Msg msg : newsOutput.getMsg()) {
             System.out.println("id:".concat(msg.getId().toString()));
             for (String line : msg.getLine()) {
@@ -118,12 +120,15 @@ public class GalileoNewsTest {
     public void newsTest2() {
         news.setUserName("user1");
         news.setPassword("user1");
-        news.setImportant(Boolean.TRUE);
+        news.setImportant(Boolean.FALSE);
         Entity<NewsInput> newsInput = Entity.entity(news, APPLICATION_XML_TYPE);
         Response response = client.target("http://localhost:8080/galileonews/news/")
                 .request().post(newsInput, Response.class);
         NewsOutput newsOutput = response.readEntity(NewsOutput.class);
-        assertTrue(newsOutput != null);        
+        assertTrue(newsOutput != null);
+        assertTrue(newsOutput.getMsg().size() == 2);
+        assertTrue(newsOutput.getMsg().get(0).getId().longValue() == 1);
+        assertTrue(newsOutput.getMsg().get(1).getId().longValue() == 2);
         for (Msg msg : newsOutput.getMsg()) {
             System.out.println("id:".concat(msg.getId().toString()));
             for (String line : msg.getLine()) {
