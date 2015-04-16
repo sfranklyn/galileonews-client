@@ -18,6 +18,7 @@ package samuelf.web.id.galileonews.client;
 import galileonews.api.Msg;
 import galileonews.api.NewsInput;
 import galileonews.api.NewsOutput;
+import java.util.Date;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -101,13 +102,17 @@ public class GalileoNewsTest {
         news.setUserName("user1");
         news.setPassword("user1");
         news.setImportant(Boolean.TRUE);
+        news.setAscending(Boolean.TRUE);
+        news.setToday(new Date());
         Entity<NewsInput> newsInput = Entity.entity(news, APPLICATION_XML_TYPE);
         Response response = client.target("http://localhost:8080/galileonews/news/")
                 .request().post(newsInput, Response.class);
         NewsOutput newsOutput = response.readEntity(NewsOutput.class);
         assertTrue(newsOutput != null);
-        assertTrue(newsOutput.getMsg().size() == 1);
-        assertTrue(newsOutput.getMsg().get(0).getId().longValue() == 3);
+        assertTrue(newsOutput.getMsg().size() == 3);
+        assertTrue(newsOutput.getMsg().get(0).getId().longValue() == 7);
+        assertTrue(newsOutput.getMsg().get(1).getId().longValue() == 8);
+        assertTrue(newsOutput.getMsg().get(2).getId().longValue() == 3);
         for (Msg msg : newsOutput.getMsg()) {
             System.out.println("id:".concat(msg.getId().toString()));
             for (String line : msg.getLine()) {
@@ -122,6 +127,8 @@ public class GalileoNewsTest {
         news.setUserName("user1");
         news.setPassword("user1");
         news.setImportant(Boolean.FALSE);
+        news.setAscending(Boolean.TRUE);
+        news.setToday(new Date());
         Entity<NewsInput> newsInput = Entity.entity(news, APPLICATION_XML_TYPE);
         Response response = client.target("http://localhost:8080/galileonews/news/")
                 .request().post(newsInput, Response.class);
@@ -144,6 +151,7 @@ public class GalileoNewsTest {
         news.setUserName("user1");
         news.setPassword("user1");
         news.setImportant(Boolean.TRUE);
+        news.setAscending(Boolean.TRUE);
         DateTime today = new DateTime();
         news.setToday(today.plusDays(2).toDate());
         Entity<NewsInput> newsInput = Entity.entity(news, APPLICATION_XML_TYPE);
@@ -151,8 +159,10 @@ public class GalileoNewsTest {
                 .request().post(newsInput, Response.class);
         NewsOutput newsOutput = response.readEntity(NewsOutput.class);
         assertTrue(newsOutput != null);
-        assertTrue(newsOutput.getMsg().size() == 1);
-        assertTrue(newsOutput.getMsg().get(0).getId().longValue() == 6);
+        assertTrue(newsOutput.getMsg().size() == 3);
+        assertTrue(newsOutput.getMsg().get(0).getId().longValue() == 7);
+        assertTrue(newsOutput.getMsg().get(1).getId().longValue() == 8);
+        assertTrue(newsOutput.getMsg().get(2).getId().longValue() == 6);
         for (Msg msg : newsOutput.getMsg()) {
             System.out.println("id:".concat(msg.getId().toString()));
             for (String line : msg.getLine()) {
@@ -167,16 +177,19 @@ public class GalileoNewsTest {
         news.setUserName("user1");
         news.setPassword("user1");
         news.setImportant(Boolean.FALSE);
+        news.setAscending(Boolean.TRUE);
         DateTime today = new DateTime();
-        news.setToday(today.plusDays(2).toDate());
+        news.setToday(today.plusDays(1).toDate());
         Entity<NewsInput> newsInput = Entity.entity(news, APPLICATION_XML_TYPE);
         Response response = client.target("http://localhost:8080/galileonews/news/")
                 .request().post(newsInput, Response.class);
         NewsOutput newsOutput = response.readEntity(NewsOutput.class);
         assertTrue(newsOutput != null);
-        assertTrue(newsOutput.getMsg().size() == 2);
-        assertTrue(newsOutput.getMsg().get(0).getId().longValue() == 4);
-        assertTrue(newsOutput.getMsg().get(1).getId().longValue() == 5);
+        assertTrue(newsOutput.getMsg().size() == 4);
+        assertTrue(newsOutput.getMsg().get(0).getId().longValue() == 1);
+        assertTrue(newsOutput.getMsg().get(1).getId().longValue() == 2);
+        assertTrue(newsOutput.getMsg().get(2).getId().longValue() == 4);
+        assertTrue(newsOutput.getMsg().get(3).getId().longValue() == 5);
         for (Msg msg : newsOutput.getMsg()) {
             System.out.println("id:".concat(msg.getId().toString()));
             for (String line : msg.getLine()) {
@@ -185,4 +198,32 @@ public class GalileoNewsTest {
             System.out.println();
         }
     }
+
+    @Test
+    public void newsTest5() {
+        news.setUserName("user1");
+        news.setPassword("user1");
+        news.setImportant(Boolean.FALSE);
+        DateTime today = new DateTime();
+        news.setToday(today.plusDays(1).toDate());
+        news.setAscending(Boolean.FALSE);
+        Entity<NewsInput> newsInput = Entity.entity(news, APPLICATION_XML_TYPE);
+        Response response = client.target("http://localhost:8080/galileonews/news/")
+                .request().post(newsInput, Response.class);
+        NewsOutput newsOutput = response.readEntity(NewsOutput.class);
+        assertTrue(newsOutput != null);
+        assertTrue(newsOutput.getMsg().size() == 4);
+        assertTrue(newsOutput.getMsg().get(0).getId().longValue() == 4);
+        assertTrue(newsOutput.getMsg().get(1).getId().longValue() == 5);
+        assertTrue(newsOutput.getMsg().get(2).getId().longValue() == 1);
+        assertTrue(newsOutput.getMsg().get(3).getId().longValue() == 2);
+        for (Msg msg : newsOutput.getMsg()) {
+            System.out.println("id:".concat(msg.getId().toString()));
+            for (String line : msg.getLine()) {
+                System.out.println("line:".concat(line));
+            }
+            System.out.println();
+        }
+    }
+
 }
