@@ -27,10 +27,11 @@ import javax.ws.rs.core.Response;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.AfterClass;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -217,6 +218,31 @@ public class GalileoNewsTest {
         assertTrue(newsOutput.getMsg().get(1).getId().longValue() == 5);
         assertTrue(newsOutput.getMsg().get(2).getId().longValue() == 1);
         assertTrue(newsOutput.getMsg().get(3).getId().longValue() == 2);
+        for (Msg msg : newsOutput.getMsg()) {
+            System.out.println("id:".concat(msg.getId().toString()));
+            for (String line : msg.getLine()) {
+                System.out.println("line:".concat(line));
+            }
+            System.out.println();
+        }
+    }
+
+    @Test
+    public void newsTest6() {
+        news.setUserName("user1");
+        news.setPassword("user1");
+        news.setToday(new Date());
+        Entity<NewsInput> newsInput = Entity.entity(news, APPLICATION_XML_TYPE);
+        Response response = client.target("http://localhost:8080/galileonews/news/")
+                .request().post(newsInput, Response.class);
+        NewsOutput newsOutput = response.readEntity(NewsOutput.class);
+        assertTrue(newsOutput != null);
+        assertTrue(newsOutput.getMsg().size() == 5);
+        assertTrue(newsOutput.getMsg().get(0).getId().longValue() == 7);
+        assertTrue(newsOutput.getMsg().get(1).getId().longValue() == 8);
+        assertTrue(newsOutput.getMsg().get(2).getId().longValue() == 1);
+        assertTrue(newsOutput.getMsg().get(3).getId().longValue() == 2);
+        assertTrue(newsOutput.getMsg().get(4).getId().longValue() == 3);
         for (Msg msg : newsOutput.getMsg()) {
             System.out.println("id:".concat(msg.getId().toString()));
             for (String line : msg.getLine()) {
