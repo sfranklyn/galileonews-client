@@ -252,4 +252,11 @@ public class GalileoNewsTest {
         }
     }
 
+    @Test
+    public void newsTest7() {
+        Response response = client.target("http://localhost:8080/galileonews/news/id1")
+                .request().get();
+        assertTrue(response.getHeaderString("Content-Disposition").contains("Spesifikasi_Galileo_News.txt"));
+    }
+
 }
