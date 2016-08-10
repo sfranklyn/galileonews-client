@@ -18,12 +18,17 @@ package samuelf.web.id.galileonews.client;
 import galileonews.api.Msg;
 import galileonews.api.NewsInput;
 import galileonews.api.NewsOutput;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML_TYPE;
 import javax.ws.rs.core.Response;
+import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -249,6 +254,24 @@ public class GalileoNewsTest {
                 System.out.println("line:".concat(line));
             }
             System.out.println();
+        }
+    }
+
+    @Test
+    public void newsTest7() {
+        Response response = client.target("http://localhost:8080/galileonews/news/id1")
+                .request().get();
+        String header = response.getHeaderString("Content-Disposition");
+        System.out.println(header);
+        assertTrue(header.contains("Spesifikasi_Galileo_News.txt"));
+        InputStream is = response.readEntity(InputStream.class);
+        try {
+            byte[] byteArray = IOUtils.toByteArray(is);
+            int attachmentSize = byteArray.length;
+            System.out.println("attachment size :" + attachmentSize);
+            assertTrue(attachmentSize > 0);
+        } catch (IOException ex) {
+            Logger.getLogger(GalileoNewsTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
